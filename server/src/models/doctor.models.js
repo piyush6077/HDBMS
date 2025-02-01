@@ -1,23 +1,10 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const doctorSchema = new mongoose.Schema(
     {
-        name: {
-            type: String, 
-            required: true
-        },
-        specialization: {
-            type: String,
-            required: true
-        },
-        contactNo: {
-            type: String,
-            required: true
-        },
-        email: {
-            type: String,
-            required: true,
-            unique: true
+        userId:{
+            type: Schema.Types.ObjectId,
+            ref:"User"
         },
         availability: [
             {

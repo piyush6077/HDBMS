@@ -2,30 +2,20 @@ import mongoose from "mongoose"
 
 const patientSchema = new mongoose.Schema(
     {
-        name: {
-            type: String,
-            required: true,
-            lowercase: true,
-            trim: true
-        },
-        age: {
-            type: String,
-            required: true
-        },
-        contactNo: {
-            type: String,
-            required: true,
-            unique: true
-        },
-        gender: {
-            type: String,
-            required: true
+        userId:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"            
         },
         dateOfBirth: {
             type: Date,
             required: true
-        }
-
+        },
+        medicalHistory:[
+            {
+                type: String,
+                required: true
+            }
+        ]
     }
 )
 
