@@ -2,6 +2,20 @@ import { Doctor } from "../models/doctor.models.js";
 import { Patient } from "../models/patient.models.js";
 import {User} from "../models/user.model.js"
 
+const generateAccessAndRefreshToken = async(user)=>{
+    try {
+        const refreshToken = await user.generateRefreshToken()
+        const accessToken = await user.generateAccessToken()
+    
+        user.refreshToken = refreshToken
+        await user.save()
+        return {accessToken , refreshToken}
+    } catch (error) {
+        throw new Error(`Error generating tokens: ${error.message}`);
+    }
+}
+
+
 
 export const handleSignUp = async (req,res)=>{
     try {
@@ -92,4 +106,46 @@ export const handleSignUp = async (req,res)=>{
         console.log(error)
         res.status(400).json({success:false , message:"Internal server Error"})
     }
+}
+
+export const handleLogin = async (req,res)=>{
+    const {email, contactNo , password, role} = req.body;
+    if(!password || !contactNo || !password || !role) return res.status(400).json("Please fill all details")
+
+    const user = await User.findOne({
+        $or:[{email},{contactNo}]
+    })
+        
+    const isPasswordValid = await user.isPasswordCorrect(password);
+    if(!isPasswordValid) return res.status(401).json({success:false , message:"Invalid Credentials"})
+            
+
+    if(!user) return res.status(401).json({success:false , message:"User not found"})
+
+    const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user)
+
+    const options={
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== "development"
+    }
+
+    return res
+    .status(200)
+    .cookie('accessToken', accessToken , options)
+    .cookie('refreshToken' , refreshToken , options)
+    .json({success:true , user}) 
+}
+
+export const handleLogout = async (req,res)=>{
+
+    const options = {
+        httpOnly: true,
+        secure:process.env.NODE_ENV !== "development",
+    }
+
+    return res
+    .status(200)
+    .clearCookie("accessToken", {}, options)
+    .clearCookie("refreshToken", {} ,options)
+    .json("User Logged Out successfully")
 }

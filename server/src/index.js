@@ -1,5 +1,6 @@
 import express from "express"
 import dotenv from "dotenv"
+import cookieParser from "cookie-parser";
 import userRouter from "./deviceRoutes/user.routes.js"
 import { EventEmitter } from "events";
 import connectDB from "./db/db.js";
@@ -13,7 +14,7 @@ const PORT = process.env.PORT || 5100
 
 // Middleware
 app.use(express.json())
-
+app.use(cookieParser())
 
 app.use("/api/v1", userRouter)
 
