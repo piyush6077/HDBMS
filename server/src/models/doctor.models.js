@@ -6,6 +6,14 @@ const doctorSchema = new mongoose.Schema(
             type: Schema.Types.ObjectId,
             ref:"User"
         },
+        specialization: {
+            type: String,
+            required: true
+        },
+        experience: {
+            type: String,
+            required: true
+        },
         availability: [
             {
                 day: {

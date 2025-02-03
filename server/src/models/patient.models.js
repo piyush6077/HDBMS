@@ -7,8 +7,12 @@ const patientSchema = new mongoose.Schema(
             ref: "User"            
         },
         dateOfBirth: {
-            type: Date,
+            type: String,
             required: true
+        },
+        bloodGroup:{
+            type:String,
+            enum:["O+","O-","B+","B-","AB+","AB-","A+","A-"],
         },
         medicalHistory:[
             {
