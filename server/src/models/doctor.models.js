@@ -17,7 +17,7 @@ const doctorSchema = new mongoose.Schema(
         availability: [
             {
                 day: {
-                    type: String,
+                    type: [String],
                     required: true
                 },
                 available: {
