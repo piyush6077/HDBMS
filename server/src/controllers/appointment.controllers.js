@@ -1,21 +1,21 @@
 import { Appointment } from "../models/appointment.model.js";
-import {Doctor} from "../models/doctor.model.js";
+import { Doctor } from "../models/doctor.models.js";
 import { Patient } from "../models/patient.models.js";
 
 export const handleAppointments = async(req, res)=>{    
     try {
         const { startTime , endTime , appointmentDate ,doctorId } = req.body; 
-        if(!startTime || !endTime || !appointmentDate){
+        if(!startTime || !endTime || !appointmentDate || !doctorId){
             return res.status(400).json({message: "Please provide all required fields"});
         }
         
-        const patientId = req.user?.patientId;
+        const patientId = req.user?._id;
         if(!patientId){
             return res.status(400).json({message: "You are not a patient"});
         }       
         
         const existingAppointment = await Appointment.findOne({
-            doctorId: doctor._id,
+            doctorId,
             appointmentDate,
             $or:[
                 {startTime: {$lt: endTime} , endTime: {$gt: startTime}}
@@ -24,13 +24,14 @@ export const handleAppointments = async(req, res)=>{
         if(existingAppointment) return res.status(409).json({message: "The current doctor has an Appointment at the selected Time"})
     
     
-        const doctorExist = await Doctor.findById(doctor._id);
+        const doctorExist = await Doctor.findOne({doctorId});
+        console.log(doctorExist);
         if(!doctorExist){
             return res.status(400).json({success:false,message:"Doctor does not exist"})
         }
     
         
-        const patientExist = await Patient.findById(patientId);
+        const patientExist = await Patient.findOne({patientId});
         if(!patientExist){
             return res.status(400).json({success:false,message:"Patient does not exist"})
         }
@@ -39,13 +40,15 @@ export const handleAppointments = async(req, res)=>{
         const options = {weekday:"long"}
         const day = appDate.toLocaleDateString("en-Us",options)
     
+        console.log(day)
         const doctor = await Doctor.findOne({
-            doctorId:doctor._id,
-            availablity:{
+            doctorId: doctorId,
+            availability:{
                 $elemMatch:{
-                    "day": day,
-                    "available.startTime": {$lte: startTime},
-                    "available.endTime": {$gte : endTime}          
+                    "day": { $in: [day] },
+                    "available": true,
+                    "startTime": {$lte: endTime},
+                    "endTime": {$gte : startTime}          
                 }
             }
         }
@@ -58,6 +61,7 @@ export const handleAppointments = async(req, res)=>{
         const appointmentStatus = 'pending'
         
         const appointment = await Appointment.create({
+            day,
             startTime,
             endTime,
             appointmentDate,
@@ -87,7 +91,7 @@ export const deleteAppointment = async (req,res) =>{
             return res.status(400).json({message:"You can only cancel your own appointments"})
         }
     
-        await appointment.findByIdAndDelete(appointmentID)  
+        await appointment.findByIdAndDelete(appointmentId)  
     
     } catch (error) {
         console.log("Error deleting the Appointment",error);

@@ -65,7 +65,7 @@ export const handleSignUp = async (req,res)=>{
             }
             
             const doctor = await Doctor.create({
-                UserId : user._id,
+                doctorId: user._id,
                 specialization ,
                 availability ,
                 experience
@@ -86,7 +86,7 @@ export const handleSignUp = async (req,res)=>{
         })
         
         const patient = await Patient.create({
-            userId:user._id,
+            patientId:user._id,
             medicalHistory,
             bloodGroup,
             dateOfBirth
@@ -121,6 +121,7 @@ export const handleLogin = async (req,res)=>{
 
     if(!user) return res.status(401).json({success:false , message:"User not found"})
 
+    const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
     const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user)
 
     const options={
@@ -132,7 +133,7 @@ export const handleLogin = async (req,res)=>{
     .status(200)
     .cookie('accessToken', accessToken , options)
     .cookie('refreshToken' , refreshToken , options)
-    .json({success:true , user}) 
+    .json({success:true , loggedInUser}) 
 }
 
 export const handleLogout = async (req,res)=>{

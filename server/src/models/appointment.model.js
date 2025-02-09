@@ -19,18 +19,26 @@ const appointmentSchema = new mongoose.Schema(
         startTime:{
             type: String,
             required: true,
-            validate: function(v) {
-                return /^([01]\d|2[0-3]):([0-5]\d)$/.test(v)
-            },
-            message: props => `${props.value} is not a valid time format!`
+            validate: {
+                validator: function(v) {
+                    return /^([01]\d|2[0-3]):([0-5]\d)$/.test(v);
+                },
+                message: props => `${props.value} is not a valid time format!`
+            }
+        },
+        day: {
+            type: String,
+            enum:['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         },
         endTime: {
             type: String,
             required: true,
-            validate: function(v) {
-                return /^([01]\d|2[0-3]):([0-5]\d)$/.test(v)
-            },
-            message: props => `${props.value} is not a valid time format!`
+            validate: {
+                validator: function(v) {
+                    return /^([01]\d|2[0-3]):([0-5]\d)$/.test(v);
+                },
+                message: props => `${props.value} is not a valid time format!`
+            }
         },
         Status: {
             type: String,

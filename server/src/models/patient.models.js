@@ -2,7 +2,7 @@ import mongoose from "mongoose"
 
 const patientSchema = new mongoose.Schema(
     {
-        userId:{
+        patientId:{
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"            
         },
