@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema(
         },
         role:{
             type: String,
-            enum: ['Doctor','Patient'],
+            enum: ['doctor','patient'],
             required: true
         },
         refreshToken:{

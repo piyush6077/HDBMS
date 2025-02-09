@@ -4,7 +4,7 @@ import { Patient } from "../models/patient.models.js";
 
 export const handleAppointments = async(req, res)=>{    
     try {
-        const { startTime , endTime , appointmentDate ,status } = req.body; 
+        const { startTime , endTime , appointmentDate ,doctorId } = req.body; 
         if(!startTime || !endTime || !appointmentDate){
             return res.status(400).json({message: "Please provide all required fields"});
         }

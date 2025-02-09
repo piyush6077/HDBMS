@@ -55,9 +55,7 @@ export const handleSignUp = async (req,res)=>{
         
         const createdUser = await User.findById(user._id).select("-password")
     
-        if ( role === 'Doctor') {
-
-            
+        if ( role === 'doctor') {          
             const {specialization , availability , experience } = req.body;
             if (!specialization || !availability || !experience ){
                 return res.status(400).json({
@@ -72,10 +70,11 @@ export const handleSignUp = async (req,res)=>{
                 availability ,
                 experience
             })
+            return res.status(200).json({success:false , doctor: doctor , user:user})
         }
 
         
-        if( role === 'Patient') {
+        if( role === 'patient') {
 
             const {medicalHistory , bloodGroup , dateOfBirth } = req.body; 
             

@@ -8,4 +8,4 @@ router.use("/signup", handleSignUp)
 router.use("/login", handleLogin)
 router.use("/logout", verifyJWT, handleLogout)
 
-export default router;
+export default router; 
