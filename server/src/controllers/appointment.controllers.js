@@ -38,7 +38,7 @@ export const handleAppointments = async(req, res)=>{
     
         const appDate = new Date(appointmentDate);
         const options = {weekday:"long"}
-        const day = appDate.toLocaleDateString("en-Us",options)
+        const day = appDate.toLocaleDateString("en-US",options)
     
         console.log(day)
         const doctor = await Doctor.findOne({
@@ -78,6 +78,54 @@ export const handleAppointments = async(req, res)=>{
     }   
 }
 
+export const updateAppointment = async (req,res) =>{
+    try {
+        const {appointmentId} = req.params;
+        const patientId = req.user?._id
+        const {startTime , endTime , appointmentDate} = req.body;
+    
+        const appointment = await Appointment.findById(appointmentId) 
+        if(!appointment) return res.status(400).json({message:"No such appointment found"})
+    
+        if(appointment.patientId.toString() !== patientId){
+            return res.status(400).json({message:"You can only update your own appointments"})
+        }
+    
+        const appDate = new Date(appointmentDate);
+        const options = {weekday:"long"}
+        const day = appDate.toLocaleDateString("en-US",options)
+    
+        const doctor = await Doctor.findOne({
+            doctorId: appointment.doctorId,
+            availability:{
+                $elemMatch:{
+                    "day": { $in: [day] },
+                    "available": true,
+                    "startTime": {$lte: endTime},
+                    "endTime": {$gte : startTime}          
+                }
+            }
+        }
+        );
+    
+        if(!doctor){
+            return res.status(400).json({success: false , message: "Doctor is not availabe at that time"})
+        }
+    
+        const updatedAppointment = await Appointment.findByIdAndUpdate(appointmentId,{
+            day,
+            startTime,
+            endTime,
+            appointmentDate
+        },{new:true})
+    
+        return res.status(201).json({message:"Appointment updated successfully" , Appointment: updatedAppointment})
+    
+    } catch (error) {
+        console.log("Error updating the Appointment",error);
+        return res.status(500).json({message:error.message})
+    }
+}
 
 export const deleteAppointment = async (req,res) =>{
     try {
@@ -91,14 +139,13 @@ export const deleteAppointment = async (req,res) =>{
             return res.status(400).json({message:"You can only cancel your own appointments"})
         }
     
-        await appointment.findByIdAndDelete(appointmentId)  
+        await Appointment.findByIdAndDelete(appointmentId)  
     
     } catch (error) {
         console.log("Error deleting the Appointment",error);
         return res.status(500).json({message:error.message})
     }
 }
-
 
 export const getDoctors = (req,res) => {
     return res.status(201).json({message:"get doctors"} , req.user)
