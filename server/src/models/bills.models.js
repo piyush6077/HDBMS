@@ -5,7 +5,7 @@ export const billSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: "Patient"
     },
-    tratmentId:{
+    treatmentId:{
         type: Schema.Types.ObjectId,
         ref:"Treatment"
     },

@@ -40,7 +40,7 @@ const appointmentSchema = new mongoose.Schema(
                 message: props => `${props.value} is not a valid time format!`
             }
         },
-        Status: {
+        status: {
             type: String,
             enum: ['Scheduled','ReScheduled','Pending','Canceled','Completed'],
             default: 'Scheduled'

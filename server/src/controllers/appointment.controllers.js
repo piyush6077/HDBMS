@@ -146,8 +146,31 @@ export const deleteAppointment = async (req,res) =>{
         return res.status(500).json({message:error.message})
     }
 }
-
+ 
 export const getDoctors = (req,res) => {
     return res.status(201).json({message:"get doctors"} , req.user)
+}
+
+export const confirmAppointment = async (req,res) =>{
+    try {
+        const {appointmentId} = req.params; 
+        const patientId = req.user?._id;
+    
+        const appointment = await Appointment.findById(appointmentId)
+        if(!appointment) return res.status(400).json({message:"No such appointment found"})
+    
+        if(appointment.patientId.toString() !== patientId){
+            return res.status(400).json({message:"You can only confirm your own appointments"})
+        }
+    
+        appointment.status = "Scheduled";
+        await appointment.save();
+    
+        return res.status(201).json({message:"Appointment confirmed successfully" , Appointment: appointment})
+    
+    } catch (error) {
+        console.log("Error confirming the Appointment",error);
+        return res.status(500).json({message:error.message})
+    }
 }
 
